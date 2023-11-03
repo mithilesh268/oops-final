@@ -1,32 +1,39 @@
 import java.util.Random;
 import java.util.Scanner;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 
 class Student {
     private int rollNumber;
     private String name;
-    private int[] attendance;
+    private AttendanceDay[] attendance;
     private String year;
 
     public Student(int rollNumber, String name, String year) {
         this.rollNumber = rollNumber;
         this.name = name;
         this.year = year;
-        attendance = new int[30]; // Assuming 1 month with 30 days
+        attendance = new AttendanceDay[30]; // Assuming 1 month with 30 days
         initializeAttendance();
     }
 
     private void initializeAttendance() {
         Random rand = new Random();
+        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
+        Date currentDate = new Date();
+
         for (int i = 0; i < attendance.length; i++) {
-            attendance[i] = rand.nextInt(2); // 0 for absent, 1 for present
+            Date day = new Date(currentDate.getTime() - i * 24 * 60 * 60 * 1000); // Subtract i days
+            String formattedDate = dateFormat.format(day);
+            attendance[i] = new AttendanceDay(formattedDate, rand.nextInt(2)); // 0 for absent, 1 for present
         }
     }
 
     public double calculateAttendancePercentage() {
         int totalDays = attendance.length;
         int presentDays = 0;
-        for (int day : attendance) {
-            if (day == 1) {
+        for (AttendanceDay day : attendance) {
+            if (day.getStatus() == 1) {
                 presentDays++;
             }
         }
@@ -39,22 +46,48 @@ class Student {
 
     public void markAttendance(int day, int status) {
         if (day >= 1 && day <= attendance.length && (status == 0 || status == 1)) {
-            attendance[day - 1] = status;
-            System.out.println("Attendance marked for " + name + " on day " + day);
+            attendance[day - 1].setStatus(status);
+            System.out.println("Attendance marked for " + name + " on Day " + day);
         } else {
             System.out.println("Invalid day or status. Please provide valid inputs.");
         }
     }
 
     public void displayAttendanceRecord() {
-        System.out.println("Attendance Record for " + name + ":");
+        System.out.println("Attendance Record for " + name + " (Year: " + year + "):");
         for (int i = 0; i < attendance.length; i++) {
-            System.out.println("Day " + (i + 1) + ": " + (attendance[i] == 1 ? "Present" : "Absent"));
+            System.out.println("Day " + (i + 1) + ": " + attendance[i].getStatusText() + " on " + attendance[i].getDate());
         }
     }
 
     public boolean matchesRollNumber(int rollNumber) {
         return this.rollNumber == rollNumber;
+    }
+}
+
+class AttendanceDay {
+    private String date;
+    private int status; // 0 for absent, 1 for present
+
+    public AttendanceDay(String date, int status) {
+        this.date = date;
+        this.status = status;
+    }
+
+    public String getDate() {
+        return date;
+    }
+
+    public int getStatus() {
+        return status;
+    }
+
+    public void setStatus(int status) {
+        this.status = status;
+    }
+
+    public String getStatusText() {
+        return (status == 1) ? "Present" : "Absent";
     }
 }
 
@@ -82,7 +115,7 @@ class FourthYearStudent extends Student {
     }
 }
 
-public class AttendanceManagementSystem {
+class AttendanceManagementSystem {
     public static void main(String[] args) {
         Student[] students = new Student[100];
 
@@ -90,8 +123,6 @@ public class AttendanceManagementSystem {
         String[] secondYearNames = generateRandomNames(25);
         String[] thirdYearNames = generateRandomNames(25);
         String[] fourthYearNames = generateRandomNames(25);
-
-        Random rand = new Random();
 
         // Create students with names and calculate attendance
         for (int i = 0; i < 25; i++) {
