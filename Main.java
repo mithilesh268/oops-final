@@ -1,292 +1,220 @@
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.Random;
 import java.util.Scanner;
 
 class Student {
-    private String studentId;
-    private String studentName;
-    private int daysPresent;
-    private int daysAbsent;
+    private int rollNumber;
+    private String name;
+    private int[] attendance;
+    private String year;
 
-    public Student(String studentId, String studentName) {
-        this.studentId = studentId;
-        this.studentName = studentName;
-        this.daysPresent = 0;
-        this.daysAbsent = 0;
+    public Student(int rollNumber, String name, String year) {
+        this.rollNumber = rollNumber;
+        this.name = name;
+        this.year = year;
+        attendance = new int[30]; // Assuming 1 month with 30 days
+        initializeAttendance();
     }
 
-    public String getStudentId() {
-        return studentId;
+    private void initializeAttendance() {
+        Random rand = new Random();
+        for (int i = 0; i < attendance.length; i++) {
+            attendance[i] = rand.nextInt(2); // 0 for absent, 1 for present
+        }
     }
 
-    public String getStudentName() {
-        return studentName;
-    }
-    public int getDaysPresent() {
-        return daysPresent;
-    }
-
-    public int getDaysAbsent() {
-        return daysAbsent;
-    }
-
-    public void markPresent() {
-        daysPresent++;
+    public double calculateAttendancePercentage() {
+        int totalDays = attendance.length;
+        int presentDays = 0;
+        for (int day : attendance) {
+            if (day == 1) {
+                presentDays++;
+            }
+        }
+        return (double) presentDays / totalDays * 100;
     }
 
-    public void markAbsent() {
-        daysAbsent++;
-    }
-}
-
-class Course {
-    private String courseId;
-    private String courseName;
-    private List<Student> enrolledStudents;
-
-    public Course(String courseId, String courseName) {
-        this.courseId = courseId;
-        this.courseName = courseName;
-        enrolledStudents = new ArrayList<>();
+    public String getStudentInfo() {
+        return "Year: " + year + ", Roll Number: " + rollNumber + ", Name: " + name;
     }
 
-    public String getCourseId() {
-        return courseId;
+    public void markAttendance(int day, int status) {
+        if (day >= 1 && day <= attendance.length && (status == 0 || status == 1)) {
+            attendance[day - 1] = status;
+            System.out.println("Attendance marked for " + name + " on day " + day);
+        } else {
+            System.out.println("Invalid day or status. Please provide valid inputs.");
+        }
     }
 
-    public String getCourseName() {
-        return courseName;
+    public void displayAttendanceRecord() {
+        System.out.println("Attendance Record for " + name + ":");
+        for (int i = 0; i < attendance.length; i++) {
+            System.out.println("Day " + (i + 1) + ": " + (attendance[i] == 1 ? "Present" : "Absent"));
+        }
     }
 
-    public List<Student> getEnrolledStudents() {
-        return enrolledStudents;
-    }
-
-    public void enrollStudent(Student student) {
-        enrolledStudents.add(student);
+    public boolean matchesRollNumber(int rollNumber) {
+        return this.rollNumber == rollNumber;
     }
 }
 
-class AttendanceRecord {
-    private String date;
-    private Map<String, Boolean> studentAttendance;
-
-    public AttendanceRecord(String date) {
-        this.date = date;
-        studentAttendance = new HashMap<>();
-    }
-
-    public String getDate() {
-        return date;
-    }
-
-    public Map<String, Boolean> getStudentAttendance() {
-        return studentAttendance;
-    }
-
-    public void markAttendance(String studentId, boolean isPresent) {
-        studentAttendance.put(studentId, isPresent);
+class FirstYearStudent extends Student {
+    public FirstYearStudent(int rollNumber, String name) {
+        super(rollNumber, name, "1st Year");
     }
 }
 
-class AttendanceManagementSystem {
+class SecondYearStudent extends Student {
+    public SecondYearStudent(int rollNumber, String name) {
+        super(rollNumber, name, "2nd Year");
+    }
+}
+
+class ThirdYearStudent extends Student {
+    public ThirdYearStudent(int rollNumber, String name) {
+        super(rollNumber, name, "3rd Year");
+    }
+}
+
+class FourthYearStudent extends Student {
+    public FourthYearStudent(int rollNumber, String name) {
+        super(rollNumber, name, "4th Year");
+    }
+}
+
+public class AttendanceManagementSystem {
     public static void main(String[] args) {
-        List<Student> students = new ArrayList<>();
-        List<Course> courses = new ArrayList<>();
-        List<AttendanceRecord> attendanceRecords = new ArrayList<>();
+        Student[] students = new Student[100];
+
+        String[] firstYearNames = generateRandomNames(25);
+        String[] secondYearNames = generateRandomNames(25);
+        String[] thirdYearNames = generateRandomNames(25);
+        String[] fourthYearNames = generateRandomNames(25);
+
+        Random rand = new Random();
+
+        // Create students with names and calculate attendance
+        for (int i = 0; i < 25; i++) {
+            students[i] = new FirstYearStudent(i + 1, firstYearNames[i]);
+            students[i + 25] = new SecondYearStudent(i + 1, secondYearNames[i]);
+            students[i + 50] = new ThirdYearStudent(i + 1, thirdYearNames[i]);
+            students[i + 75] = new FourthYearStudent(i + 1, fourthYearNames[i]);
+        }
 
         Scanner scanner = new Scanner(System.in);
 
         while (true) {
-            System.out.println("\nAttendance Management System Menu:");
-            System.out.println("1. Add Student");
-            System.out.println("2. Add Course");
-            System.out.println("3. Enroll Student in Course");
-            System.out.println("4. Take Attendance");
-            System.out.println("5. Calculate Attendance Percentage");
-            System.out.println("6. Exit");
+            System.out.println("1. Display Student Info and Attendance Percentage");
+            System.out.println("2. Mark Attendance for a Student");
+            System.out.println("3. Display Detailed Attendance Record");
+            System.out.println("4. Search for Student by Roll Number");
+            System.out.println("5. Exit");
             System.out.print("Enter your choice: ");
 
-            int choice = scanner.nextInt();
-            scanner.nextLine();  // Consume newline
+            int choice;
+            try {
+                choice = scanner.nextInt();
+            } catch (java.util.InputMismatchException e) {
+                System.out.println("Invalid input. Please enter a number.");
+                scanner.next(); // Consume the invalid input
+                continue;
+            }
+            scanner.nextLine(); // Consume the newline character
 
             switch (choice) {
                 case 1:
-                    System.out.print("Enter Student ID: ");
-                    String studentId = scanner.nextLine();
-                    System.out.print("Enter Student Name: ");
-                    String studentName = scanner.nextLine();
-                    students.add(new Student(studentId, studentName));
-                    System.out.println("Student added successfully.");
+                    for (Student student : students) {
+                        System.out.println(student.getStudentInfo());
+                        System.out.println("Attendance Percentage: " + student.calculateAttendancePercentage() + "%");
+                        System.out.println();
+                    }
                     break;
-
                 case 2:
-                    System.out.print("Enter Course ID: ");
-                    String courseId = scanner.nextLine();
-                    System.out.print("Enter Course Name: ");
-                    String courseName = scanner.nextLine();
-                    courses.add(new Course(courseId, courseName));
-                    System.out.println("Course added successfully.");
-                    break;
+                    int rollNumber;
+                    int day;
+                    int status;
 
-                case 3:
-                    if (students.isEmpty() || courses.isEmpty()) {
-                        System.out.println("Add students and courses before enrolling.");
-                        break;
+                    try {
+                        System.out.print("Enter Roll Number: ");
+                        rollNumber = scanner.nextInt();
+                        System.out.print("Enter Day (1-30): ");
+                        day = scanner.nextInt();
+                        System.out.print("Enter Attendance Status (0 for Absent, 1 for Present): ");
+                        status = scanner.nextInt();
+                    } catch (java.util.InputMismatchException e) {
+                        System.out.println("Invalid input. Please enter valid numbers.");
+                        scanner.nextLine(); // Consume the invalid input
+                        continue;
                     }
 
-                    System.out.print("Enter Student ID: ");
-                    studentId = scanner.nextLine();
-                    System.out.print("Enter Course ID: ");
-                    courseId = scanner.nextLine();
-
-                    Student studentToEnroll = findStudentById(studentId, students);
-                    Course courseToEnroll = findCourseById(courseId, courses);
-
-                    if (studentToEnroll != null && courseToEnroll != null) {
-                        courseToEnroll.enrollStudent(studentToEnroll);
-                        System.out.println("Student enrolled in the course.");
-                    } else {
-                        System.out.println("Student or course not found.");
-                    }
-                    break;
-
-                case 4:
-                    if (courses.isEmpty()) {
-                        System.out.println("Add courses before taking attendance.");
-                        break;
-                    }
-
-                    System.out.print("Enter Course ID: ");
-                    courseId = scanner.nextLine();
-
-                    Course courseForAttendance = findCourseById(courseId, courses);
-
-                    if (courseForAttendance != null) {
-                        System.out.print("Enter Attendance Date: ");
-                        String date = scanner.nextLine();
-                        AttendanceRecord attendanceRecord = new AttendanceRecord(date);
-
-                        for (Student student : courseForAttendance.getEnrolledStudents()) {
-                            System.out.print("Is " + student.getStudentName() + " present? (true/false): ");
-                            boolean isPresent = scanner.nextBoolean();
-                            attendanceRecord.markAttendance(student.getStudentId(), isPresent);
-                            if (isPresent) {
-                                student.markPresent();
-                            } else {
-                                student.markAbsent();
-                            }
+                    boolean found = false;
+                    for (Student student : students) {
+                        if (student.matchesRollNumber(rollNumber)) {
+                            student.markAttendance(day, status);
+                            found = true;
+                            break;
                         }
-
-                        attendanceRecords.add(attendanceRecord);
-                        System.out.println("Attendance recorded successfully.");
-                    } else {
-                        System.out.println("Course not found.");
+                    }
+                    if (!found) {
+                        System.out.println("Student with the given Roll Number not found.");
                     }
                     break;
+                case 3:
+                    System.out.print("Enter Roll Number: ");
+                    rollNumber = scanner.nextInt();
+                    boolean studentFound = false;
 
+                    for (Student student : students) {
+                        if (student.matchesRollNumber(rollNumber)) {
+                            student.displayAttendanceRecord();
+                            studentFound = true;
+                            break;
+                        }
+                    }
+                    if (!studentFound) {
+                        System.out.println("Student with the given Roll Number not found.");
+                    }
+                    break;
+                case 4:
+                    System.out.print("Enter Roll Number to Search: ");
+                    rollNumber = scanner.nextInt();
+                    boolean foundStudent = false;
+
+                    for (Student student : students) {
+                        if (student.matchesRollNumber(rollNumber)) {
+                            System.out.println("Student Found:");
+                            System.out.println(student.getStudentInfo());
+                            System.out.println("Attendance Percentage: " + student.calculateAttendancePercentage() + "%");
+                            foundStudent = true;
+                            break;
+                        }
+                    }
+                    if (!foundStudent) {
+                        System.out.println("Student with the given Roll Number not found.");
+                    }
+                    break;
                 case 5:
-                    System.out.print("Enter Student ID: ");
-                    studentId = scanner.nextLine();
-                    System.out.print("Enter Course ID: ");
-                    courseId = scanner.nextLine();
-                    double attendancePercentage = calculateAttendancePercentage(studentId, courseId, courses, attendanceRecords);
-                    if (attendancePercentage >= 0) {
-                        System.out.println("Attendance Percentage: " + attendancePercentage + "%");
-                    } else if (attendancePercentage == -1) {
-                        System.out.println("Student or course not found.");
-                    } else if (attendancePercentage == -2) {
-                        System.out.println("No attendance records for this course.");
-                    }
-                    break;
-
-                case 6:
-                    System.out.println("Exiting the Attendance Management System.");
                     scanner.close();
                     System.exit(0);
-                case 7:
-                    // Calculate the average attendance
-                    double averageAttendance = calculateAverageAttendance(students);
-                    System.out.println("Average Attendance: " + averageAttendance + "%");
-                    break;
-
                 default:
-                    System.out.println("Invalid choice. Please try again.");
+                    System.out.println("Invalid choice. Please select a valid option.");
+                    break;
             }
         }
     }
 
-    private static Student findStudentById(String studentId, List<Student> students) {
-        for (Student student : students) {
-            if (student.getStudentId().equals(studentId)) {
-                return student;
-            }
+    private static String[] generateRandomNames(int count) {
+        String[] names = {
+            "Alice", "Bob", "Charlie", "David", "Eva", "Frank", "Grace", "Hannah", "Isaac", "Julia",
+            "Kevin", "Linda", "Mark", "Nina", "Oliver", "Patricia", "Quincy", "Rachel", "Samuel", "Tina",
+            "Ulysses", "Victoria", "William", "Xena", "Yara", "Zane"
+        };
+
+        String[] randomNames = new String[count];
+        Random rand = new Random();
+        for (int i = 0; i < count; i++) {
+            randomNames[i] = names[rand.nextInt(names.length)];
         }
-        return null;
-    }
-
-    private static Course findCourseById(String courseId, List<Course> courses) {
-        for (Course course : courses) {
-            if (course.getCourseId().equals(courseId)) {
-                return course;
-            }
-        }
-        return null;
-    }
-
-
-
-   private static double calculateAttendancePercentage(String studentId, String courseId, List<Course> courses, List<AttendanceRecord> attendanceRecords) {
-       Course course = findCourseById(courseId, courses);
-       if (course == null) {
-           return -1; // Student or course not found
-       }
-
-       Student student = findStudentById(studentId, course.getEnrolledStudents());
-       if (student == null) {
-           return -1; // Student or course not found
-       }
-
-       int totalClasses = 0;
-       int attendedClasses = 0;
-
-       for (AttendanceRecord record : attendanceRecords) {
-           Boolean isPresent = record.getStudentAttendance().get(studentId);
-           if (isPresent != null) {
-               totalClasses++;
-               if (isPresent) {
-                   attendedClasses++;
-               }
-           }
-       }
-
-       if (totalClasses == 0) {
-           return -2; // No attendance records for this student
-       }
-
-       return ((double) attendedClasses / totalClasses) * 100;
-   }
-
-
-    private static double calculateAverageAttendance(List<Student> students) {
-        if (students.isEmpty()) {
-            return 0.0;
-        }
-
-        int totalDays = 0;
-        int totalPresent = 0;
-
-        for (Student student : students) {
-            totalDays += student.getDaysPresent() + student.getDaysAbsent();
-            totalPresent += student.getDaysPresent();
-        }
-
-        if (totalDays > 0) {
-            return ((double) totalPresent / totalDays) * 100;
-        } else {
-            return 0.0; // No attendance records available
-        }
+        return randomNames;
     }
 }
