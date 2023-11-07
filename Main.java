@@ -1,8 +1,8 @@
+import java.util.Arrays;
 import java.util.Random;
-import java.util.Scanner;
 import java.text.SimpleDateFormat;
 import java.util.Date;
-
+import java.util.Scanner;
 class Student {
     private int rollNumber;
     private String name;
@@ -119,17 +119,53 @@ class AttendanceManagementSystem {
     public static void main(String[] args) {
         Student[] students = new Student[100];
 
-        String[] firstYearNames = generateRandomNames(25);
-        String[] secondYearNames = generateRandomNames(25);
-        String[] thirdYearNames = generateRandomNames(25);
-        String[] fourthYearNames = generateRandomNames(25);
+        // Create arrays for names and roll numbers for each year
+        String[] firstYearNames = {
+                "Amit", "Bhumi", "Cheery", "Daksh", "Ekant",
+                "Farhan", "Geet", "Himank", "Isha", "Jimmy",
+                "Kriti", "Leo", "Moon", "Noor", "Oreo",
+                "Petter", "Qureshi", "Riya", "Sanket", "Tina",
+                "Usha", "Vicky", "William", "Xander", "Yasika"
+        };
+
+        int[] firstYearRollNumbers = generateRollNumbers(firstYearNames);
+
+        String[] secondYearNames = {
+                "Ankit", "Bhaumik", "Cheetna", "Diya", "Eivy",
+                "Faruk", "Gita", "Hanshika", "Isabel", "John",
+                "Kareena", "Lisha", "Meet", "Nathan", "Oliver",
+                "Prince", "Queen", "Ruchi", "Sam", "Taylor",
+                "Urvashi", "Vishal", "William", "Xena", "Yamini"
+        };
+
+        int[] secondYearRollNumbers = generateRollNumbers(secondYearNames);
+
+        String[] thirdYearNames = {
+                "Amit", "Bhumi", "Cheery", "Daksh", "Ekant",
+                "Farhan", "Geet", "Himank", "Isha", "Jimmy",
+                "Kriti", "Leo", "Moon", "Noor", "Oreo",
+                "Petter", "Qureshi", "Riya", "Sanket", "Tina",
+                "Usha", "Vicky", "William", "Xander", "Yasika"
+        };
+
+        int[] thirdYearRollNumbers = generateRollNumbers(thirdYearNames);
+
+        String[] fourthYearNames = {
+                "Ankit", "Bhaumik", "Cheetna", "Diya", "Eivy",
+                "Faruk", "Gita", "Hanshika", "Isabel", "John",
+                "Kareena", "Lisha", "Meet", "Nathan", "Oliver",
+                "Prince", "Queen", "Ruchi", "Sam", "Taylor",
+                "Urvashi", "Vishal", "William", "Xena", "Yamini"
+        };
+
+        int[] fourthYearRollNumbers = generateRollNumbers(fourthYearNames);
 
         // Create students with names and calculate attendance
         for (int i = 0; i < 25; i++) {
-            students[i] = new FirstYearStudent(i + 1, firstYearNames[i]);
-            students[i + 25] = new SecondYearStudent(i + 1, secondYearNames[i]);
-            students[i + 50] = new ThirdYearStudent(i + 1, thirdYearNames[i]);
-            students[i + 75] = new FourthYearStudent(i + 1, fourthYearNames[i]);
+            students[i] = new FirstYearStudent(firstYearRollNumbers[i], firstYearNames[i]);
+            students[i + 25] = new SecondYearStudent(secondYearRollNumbers[i], secondYearNames[i]);
+            students[i + 50] = new ThirdYearStudent(thirdYearRollNumbers[i], thirdYearNames[i]);
+            students[i + 75] = new FourthYearStudent(fourthYearRollNumbers[i], fourthYearNames[i]);
         }
 
         Scanner scanner = new Scanner(System.in);
@@ -234,18 +270,21 @@ class AttendanceManagementSystem {
         }
     }
 
-    private static String[] generateRandomNames(int count) {
-        String[] names = {
-            "Alice", "Bob", "Charlie", "David", "Eva", "Frank", "Grace", "Hannah", "Isaac", "Julia",
-            "Kevin", "Linda", "Mark", "Nina", "Oliver", "Patricia", "Quincy", "Rachel", "Samuel", "Tina",
-            "Ulysses", "Victoria", "William", "Xena", "Yara", "Zane"
-        };
-
-        String[] randomNames = new String[count];
-        Random rand = new Random();
-        for (int i = 0; i < count; i++) {
-            randomNames[i] = names[rand.nextInt(names.length)];
+    private static int[] generateRollNumbers(String[] names) {
+        int[] rollNumbers = new int[names.length];
+        for (int i = 0; i < names.length; i++) {
+            rollNumbers[i] = i + 1;
         }
-        return randomNames;
+        return rollNumbers;
+    }
+
+    private static void shuffleArray(int[] arr) {
+        Random rand = new Random();
+        for (int i = arr.length - 1; i > 0; i--) {
+            int index = rand.nextInt(i + 1);
+            int temp = arr[index];
+            arr[index] = arr[i];
+            arr[i] = temp;
+        }
     }
 }
